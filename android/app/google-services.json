@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "588569148924",
+    "project_id": "norm-request",
+    "storage_bucket": "norm-request.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:588569148924:android:306b15a0878164afac0679",
+        "android_client_info": {
+          "package_name": "com.yuu.norm.request.norm_request"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "588569148924-apd1h7pfsoh5eo4qdn87ssordh5j5ci9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNibvxIz6B7MyA-jizQ_Q5VVG67cSAc9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "588569148924-apd1h7pfsoh5eo4qdn87ssordh5j5ci9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "588569148924-711fhprnfgcpt7mi3a7bts0a9h3ovfo4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yuu.norm.request.normRequest"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
