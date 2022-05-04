@@ -354,6 +354,38 @@ class AddRequestButton extends StatelessWidget {
 }
 
 class AddRequestDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<SearchCompanyModel>(
+        create: (_) => SearchCompanyModel()..init(),
+        child: Consumer<SearchCompanyModel>(builder: (context, model, child) {
+          final List<Company>? companies = model.companies;
+
+          if(companies == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final List<Widget> widgets = companies.map(
+                (company) => CompanyCard(
+                  company.companyId,
+                  company.name,
+                  company.industry,
+            ),
+          ).toList();
+
+          print(widgets.length);
+
+          return SearchBox(widgets);
+        }),
+    );
+  }
+}
+
+class SearchBox extends StatelessWidget {
+  final List<Widget> widgets;
+  SearchBox(this.widgets);
   var _opinionContent = TextEditingController();
 
   final snackBar = SnackBar(
@@ -377,12 +409,36 @@ class AddRequestDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final SearchCompanyModel searchStateModel = context.watch<SearchCompanyModel>();
+
     return AlertDialog(
       title: Text("分析希望の企業名"),
-      content: TextField(
-        controller: _opinionContent,
-        decoration: InputDecoration(hintText: "例：norm株式会社"),
+      content: Column(
+        children: [
+          TextField(
+            decoration: InputDecoration(
+              hintText: "例：ソフトバンク",
+            ),
+            onChanged: (text) {
+              final String keyword = text;
+              searchStateModel.changeState(keyword);
+            },
+          ),
+          Container(
+            width: double.maxFinite,
+            height: BlockSize().height(context) * 20,
+            child: GridView.count(
+              padding: EdgeInsets.all(BlockSize().width(context) * 2),
+              crossAxisCount: 1,
+              crossAxisSpacing: BlockSize().width(context) * 0,
+              mainAxisSpacing: BlockSize().height(context) * 0,
+              childAspectRatio: (8 / 1),  //カードの比（横/縦）
+              children: widgets,
+            ),
+          ),
+        ],
       ),
+
       actions: <Widget>[
         FlatButton(
           color: Colors.white,
@@ -404,6 +460,16 @@ class AddRequestDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class CompanyCard extends StatelessWidget{
+  final String companyId, name, industry;
+  CompanyCard(this.companyId, this.name, this.industry);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(name);
   }
 }
 

@@ -133,3 +133,65 @@ class AddRequest extends ChangeNotifier{
     notifyListeners();
   }
 }
+
+class Company {
+  Company(this.companyId, this.name, this.industry);
+  String companyId;
+  String name;
+  String industry;
+}
+
+class SearchCompanyModel extends ChangeNotifier {
+  List<Company>? companies;
+
+  void init() async {
+    final QuerySnapshot companiesSnapshot =
+    await FirebaseFirestore.instance.collection('companies').limit(20).get();
+
+    final List<Company> _companies = companiesSnapshot.docs.map((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      final String companyId = document.id;
+      final String name = data['name'];
+      final String industry = data['industry'];
+      return Company(companyId, name, industry);
+    }).toList();
+
+    companies = _companies;
+
+    notifyListeners();
+  }
+
+  void changeState(String keyword) async {
+    final QuerySnapshot companiesSnapshot =
+    await FirebaseFirestore.instance.collection('companies').orderBy("name")
+        .startAt([keyword]).endAt([keyword + '\uf8ff']).limit(20).get();
+
+
+    final List<Company> _companies = companiesSnapshot.docs.map((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      final String companyId = document.id;
+      final String name = data['name'];
+      final String industry = data['industry'];
+      return Company(companyId, name, industry);
+    }).toList();
+
+    companies = _companies;
+
+    notifyListeners();
+  }
+}
+
+class RewordAdsModel extends ChangeNotifier{
+
+    int? adState;
+
+    void init() async {
+      this.adState = 0;
+      notifyListeners();
+    }
+
+    void incrementGoodNum(_adState) async{
+      adState = (_adState == 3) ? adState!+1 : -1;
+      notifyListeners();
+    }
+}
