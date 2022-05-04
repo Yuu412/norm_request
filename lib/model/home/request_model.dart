@@ -183,3 +183,17 @@ class SearchCompanyModel extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+class SelectCompanyModel extends ChangeNotifier {
+  String? selectedCompany;
+
+  void init() async {
+    selectedCompany = "";
+    notifyListeners();
+  }
+
+  void selectCompnay(String company) async {
+    selectedCompany = company;
+    notifyListeners();
+  }
+}

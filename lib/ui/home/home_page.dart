@@ -384,6 +384,14 @@ class AdsCountCard extends StatelessWidget {
             AdPlayer(1),
             AdPlayer(2),
             AdPlayer(3),
+            FlatButton(
+              color: Colors.white,
+              textColor: Colors.blue,
+              child: Text('キャンセル'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ],
         );
       }
@@ -421,7 +429,6 @@ class AdPlayer extends StatelessWidget {
   }
 }
 
-
 class AddRequestDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -452,11 +459,91 @@ class AddRequestDialog extends StatelessWidget {
   }
 }
 
+class CompanyCard extends StatelessWidget{
+  final String companyId, name, industry;
+  CompanyCard(this.companyId, this.name, this.industry);
+
+  @override
+  Widget build(BuildContext context) {
+    final SelectCompanyModel selectCompanyModel = context.watch<SelectCompanyModel>();
+
+    return GestureDetector(
+      onTap: () {
+        selectCompanyModel.selectCompnay(name);
+      },
+      child: Text(name),
+    );
+  }
+}
+
 class SearchBox extends StatelessWidget {
   final List<Widget> widgets;
   SearchBox(this.widgets);
   var _opinionContent = TextEditingController();
 
+  @override
+  Widget build(BuildContext context) {
+    final SearchCompanyModel searchStateModel = context.watch<SearchCompanyModel>();
+
+    return ChangeNotifierProvider<SelectCompanyModel>(
+        create: (_) => SelectCompanyModel()..init(),
+        child: Consumer<SelectCompanyModel>(builder: (context, model, child) {
+          return AlertDialog(
+            title: Text("分析希望の企業名"),
+            content: Column(
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "例：ソフトバンク",
+                  ),
+                  onChanged: (text) {
+                    final String keyword = text;
+                    searchStateModel.changeState(keyword);
+                  },
+                ),
+                Container(
+                  width: double.maxFinite,
+                  height: BlockSize().height(context) * 20,
+                  child: GridView.count(
+                    padding: EdgeInsets.all(BlockSize().width(context) * 2),
+                    crossAxisCount: 1,
+                    crossAxisSpacing: BlockSize().width(context) * 0,
+                    mainAxisSpacing: BlockSize().height(context) * 0,
+                    childAspectRatio: (8 / 1),  //カードの比（横/縦）
+                    children: widgets,
+                  ),
+                ),
+                DisplaySelectedCompany(),
+              ],
+            ),
+
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.white,
+                textColor: Colors.blue,
+                child: Text('キャンセル'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              SendButton(),
+
+            ],
+          );
+        }),
+    );
+  }
+}
+
+class DisplaySelectedCompany extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final SelectCompanyModel selectCompanyModel = context.watch<SelectCompanyModel>();
+    return Text(selectCompanyModel.selectedCompany!);
+  }
+}
+
+class SendButton extends StatelessWidget {
   final snackBar = SnackBar(
     backgroundColor: Color(RetBackgroundColor().defaultWhite()),
     duration: const Duration(seconds: 2),
@@ -478,67 +565,20 @@ class SearchBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SearchCompanyModel searchStateModel = context.watch<SearchCompanyModel>();
-
-    return AlertDialog(
-      title: Text("分析希望の企業名"),
-      content: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              hintText: "例：ソフトバンク",
-            ),
-            onChanged: (text) {
-              final String keyword = text;
-              searchStateModel.changeState(keyword);
-            },
-          ),
-          Container(
-            width: double.maxFinite,
-            height: BlockSize().height(context) * 20,
-            child: GridView.count(
-              padding: EdgeInsets.all(BlockSize().width(context) * 2),
-              crossAxisCount: 1,
-              crossAxisSpacing: BlockSize().width(context) * 0,
-              mainAxisSpacing: BlockSize().height(context) * 0,
-              childAspectRatio: (8 / 1),  //カードの比（横/縦）
-              children: widgets,
-            ),
-          ),
-        ],
-      ),
-
-      actions: <Widget>[
-        FlatButton(
-          color: Colors.white,
-          textColor: Colors.blue,
-          child: Text('キャンセル'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        FlatButton(
-          color: Colors.white,
-          textColor: Colors.blue,
-          child: Text('OK'),
-          onPressed: (){
-            AddRequest().register(_opinionContent.text);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          },
-        ),
-      ],
+    final SelectCompanyModel selectCompanyModel = context.watch<SelectCompanyModel>();
+    return FlatButton(
+      color: Colors.white,
+      textColor: Colors.blue,
+      child: Text('リクエスト送信'),
+      onPressed: (){
+        AddRequest().register(selectCompanyModel.selectedCompany);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      },
     );
   }
 }
 
-class CompanyCard extends StatelessWidget{
-  final String companyId, name, industry;
-  CompanyCard(this.companyId, this.name, this.industry);
 
-  @override
-  Widget build(BuildContext context) {
-    return Text(name);
-  }
-}
+
 
