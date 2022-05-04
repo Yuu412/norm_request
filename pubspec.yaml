@@ -21,6 +21,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   fl_chart: ^0.41.0
   blobs: ^2.0.0
+  google_mobile_ads: ^1.2.0
 
 dev_dependencies:
   flutter_test:

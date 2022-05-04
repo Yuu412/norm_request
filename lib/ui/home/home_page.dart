@@ -2,9 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:norm_request/const/color_config.dart';
 import 'package:norm_request/const/size_config.dart';
+import 'package:norm_request/model/home/ad_manager_model.dart';
 import 'package:norm_request/model/home/request_model.dart';
 import 'package:norm_request/ui/common/icon_widget/info_widget.dart';
 import 'package:provider/provider.dart';
+
 
 class HomePage extends StatelessWidget {
   @override
@@ -331,7 +333,8 @@ class AddRequestButton extends StatelessWidget {
             context: context,
             barrierDismissible: false,
             builder: (_) {
-              return AddRequestDialog();
+              return RewordAdsDialog();
+              //return AddRequestDialog();
             },
           );
         },
@@ -352,6 +355,72 @@ class AddRequestButton extends StatelessWidget {
     );
   }
 }
+
+class RewordAdsDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<RewordAdsModel>(
+      create: (_) => RewordAdsModel()..init(),
+      child: Consumer<RewordAdsModel>(builder: (context, model, child) {
+
+        return AdsCountCard();
+      }),
+    );
+  }
+}
+
+class AdsCountCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final RewordAdsModel adManager = context.watch<RewordAdsModel>();
+
+    return Consumer<RewordAdsModel>(builder: (context, model, child) {
+      if(adManager.adCount! >= 3){
+        return AddRequestDialog();
+      } else {
+        return SimpleDialog(
+          title: Text('広告を３つ見ると応募可能！'),
+          children: <Widget>[
+            AdPlayer(1),
+            AdPlayer(2),
+            AdPlayer(3),
+          ],
+        );
+      }
+    });
+  }
+}
+
+class AdPlayer extends StatelessWidget {
+  final int adNum;
+  AdPlayer(this.adNum);
+
+  @override
+  Widget build(BuildContext context) {
+    final RewordAdsModel adManager = context.watch<RewordAdsModel>();
+
+    return Consumer<RewordAdsModel>(builder: (context, model, child) {
+      if((adManager.adState == false) & (adManager.adCount! == adNum-1)) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      if(adManager.adCount! >= adNum) {
+        return Center(
+          child: Text("終了"),
+        );
+      }
+      return SimpleDialogOption(
+        onPressed: () {
+          adManager.loadRewardedAd();
+        },
+        child: Text(adNum.toString() + 'つ目の広告'),
+      );
+    });
+  }
+}
+
 
 class AddRequestDialog extends StatelessWidget {
   @override

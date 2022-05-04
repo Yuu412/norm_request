@@ -1,7 +1,9 @@
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
 class Request {
   Request(this.id, this.content, this.good, this.order, this.goodState);
@@ -146,7 +148,7 @@ class SearchCompanyModel extends ChangeNotifier {
 
   void init() async {
     final QuerySnapshot companiesSnapshot =
-    await FirebaseFirestore.instance.collection('companies').limit(20).get();
+    await FirebaseFirestore.instance.collection('companies').limit(5).get();
 
     final List<Company> _companies = companiesSnapshot.docs.map((DocumentSnapshot document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
@@ -157,6 +159,7 @@ class SearchCompanyModel extends ChangeNotifier {
     }).toList();
 
     companies = _companies;
+    print(companies);
 
     notifyListeners();
   }
@@ -179,19 +182,4 @@ class SearchCompanyModel extends ChangeNotifier {
 
     notifyListeners();
   }
-}
-
-class RewordAdsModel extends ChangeNotifier{
-
-    int? adState;
-
-    void init() async {
-      this.adState = 0;
-      notifyListeners();
-    }
-
-    void incrementGoodNum(_adState) async{
-      adState = (_adState == 3) ? adState!+1 : -1;
-      notifyListeners();
-    }
 }
