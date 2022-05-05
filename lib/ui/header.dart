@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:norm_request/const/color_config.dart';
+import 'package:norm_request/const/size_config.dart';
 
 class Header extends StatelessWidget with PreferredSizeWidget{
   final String leading;
@@ -29,13 +30,9 @@ class _HeaderTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'norm',
-      style: TextStyle(
-        fontSize: 28,
-        color: Color(RetTextColor().gray()),
-        fontWeight: FontWeight.w300,
-      ),
+    return Image(
+      image: AssetImage('images/logo/logo-reverse.png'),
+      width: BlockSize().width(context) * 25,
     );
   }
 }
