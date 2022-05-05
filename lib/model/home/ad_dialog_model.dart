@@ -1,8 +1,6 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 class RewordAdsModel extends ChangeNotifier{

@@ -18,6 +18,9 @@ class RetTextColor {
 
   final int _lightGray = 0xffB3B8BD;
   int lightGray() => _lightGray;
+
+  final int _blue = 0xff2862FF;
+  int blue() => _blue;
 }
 
 class RetIconColor {
@@ -32,6 +35,9 @@ class RetIconColor {
 
   final int _pink = 0xffFF6A81;
   int pink() => _pink;
+
+  final int _blue = 0xff2862FF;
+  int blue() => _blue;
 }
 
 class RetLineColor {
