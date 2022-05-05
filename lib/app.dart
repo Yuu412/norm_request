@@ -18,7 +18,10 @@ class App extends StatelessWidget {
         return const SizedBox();
       }
 
+      //FirebaseAuth.instance.signOut();
+
       if (snapshot.hasData) {
+        print(snapshot.hasData);
         return HomeApp();
       }
       return LoginPage();
