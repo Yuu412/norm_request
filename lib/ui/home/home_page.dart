@@ -4,7 +4,7 @@ import 'package:norm_request/const/color_config.dart';
 import 'package:norm_request/const/size_config.dart';
 import 'package:norm_request/model/home/home_model.dart';
 import 'package:norm_request/ui/common/icon_widget/info_widget.dart';
-import 'package:norm_request/ui/home/ad_dialog.dart';
+import 'package:norm_request/ui/home/request_ad_dialog.dart';
 import 'package:norm_request/ui/home/request_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -119,9 +119,9 @@ class RequestCard extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<GoodCountModel>(
-      create: (_) => GoodCountModel(goodNum)..init(),
-      child: Consumer<GoodCountModel>(builder: (context, model, child) {
+    return ChangeNotifierProvider<RewordVoteAdsModel>(
+      create: (_) => RewordVoteAdsModel(goodState, goodNum)..init(),
+      child: Consumer<RewordVoteAdsModel>(builder: (context, model, child) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -171,7 +171,7 @@ class GoodPieChartArea extends StatelessWidget{
 class GoodPieChart extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    final GoodCountModel goodCountData = context.watch<GoodCountModel>();
+    final RewordVoteAdsModel goodCountData = context.watch<RewordVoteAdsModel>();
     final goodNum = goodCountData.goodNum!;
     final ratio = ((goodNum < 11) ? goodNum : 10).toDouble();
     final pie = ((goodNum < 1) ? 1 : goodNum).toDouble();
@@ -205,7 +205,7 @@ class GoodPieChart extends StatelessWidget{
 class ChartCenterTitle extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    final GoodCountModel goodCountData = context.watch<GoodCountModel>();
+    final RewordVoteAdsModel goodCountData = context.watch<RewordVoteAdsModel>();
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -259,12 +259,9 @@ class LikeIconArea extends StatelessWidget{
   Widget build(BuildContext context) {
     return SizedBox(
       height: BlockSize().height(context) * 22,
-      child: ChangeNotifierProvider<GoodStateModel>(
-        create: (_) => GoodStateModel(goodState)..init(),
-        child: Consumer<GoodStateModel>(builder: (context, model, child) {
-          return LikeIcon(opinionId);
-        }),
-      ),
+      child: Consumer<RewordVoteAdsModel>(builder: (context, model, child) {
+        return LikeIcon(opinionId);
+      }),
     );
   }
 }
@@ -275,17 +272,36 @@ class LikeIcon extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    final GoodStateModel goodStateModel = context.watch<GoodStateModel>();
-    final GoodCountModel goodCountModel = context.watch<GoodCountModel>();
-    final RequestListModel opinionListModel = context.watch<RequestListModel>();
-
     return SizedBox(
       width: BlockSize().width(context) * 10,
-      child: GestureDetector(
+      child: PushedLikeIcon(opinionId),
+    );
+  }
+}
+
+class PushedLikeIcon extends StatelessWidget{
+  final String requestId;
+  PushedLikeIcon(this.requestId);
+
+  @override
+  Widget build(BuildContext context) {
+    final RewordVoteAdsModel goodStateModel = context.watch<RewordVoteAdsModel>();
+    final RequestListModel opinionListModel = context.watch<RequestListModel>();
+    final RewordVoteAdsModel adManager = context.watch<RewordVoteAdsModel>();
+
+    return Consumer<RewordVoteAdsModel>(builder: (context, model, child) {
+      if(adManager.adState == false){
+        return Center(child: CircularProgressIndicator());
+      }
+      return GestureDetector(
         onTap: () {
-          goodStateModel.changeState(goodStateModel.goodState);
-          opinionListModel.pushLikeIcon(opinionId, goodStateModel.goodState, goodCountModel.goodNum);
-          goodCountModel.incrementGoodNum(goodStateModel.goodState);
+          if(goodStateModel.voteState == false){
+            adManager.loadRewardedAd(requestId);
+          } else{
+            goodStateModel.changeVoteState();
+            opinionListModel.pushLikeIcon(requestId, goodStateModel.voteState, goodStateModel.goodNum);
+            goodStateModel.incrementGoodNum(goodStateModel.voteState);
+          }
         },
         child: Container(
           width: BlockSize().width(context) * 8,
@@ -302,10 +318,10 @@ class LikeIcon extends StatelessWidget{
               ),
             ],
           ),
-          child: switchIcon(goodStateModel.goodState),
+          child: switchIcon(goodStateModel.voteState),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget switchIcon(state) {
@@ -337,7 +353,7 @@ class ShowDialogButton extends StatelessWidget {
             context: context,
             barrierDismissible: false,
             builder: (_) {
-              return ShowAdDialogProvider();
+              return ShowRequestAdDialogProvider();
               //return ShowRequestDialogProvider();
             },
           );
