@@ -21,6 +21,14 @@ class RetTextColor {
 
   final int _blue = 0xff2862FF;
   int blue() => _blue;
+
+  final int _pink = 0xffFF6A81;
+  int pink() => _pink;
+
+  final int _purple = 0xff5800FF;
+  int purple() => _purple;
+
+
 }
 
 class RetIconColor {
@@ -75,6 +83,9 @@ class RetGraphColor {
 
   final int _superLightGray = 0xffEEEEEE;
   int superLightGray() => _superLightGray;
+
+  final int _purple = 0xff5800FF;
+  int purple() => _purple;
 }
 
 class RetCardColor {

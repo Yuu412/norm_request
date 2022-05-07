@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
 
-class RewordAdsModel extends ChangeNotifier{
+class RewordRequestAdsModel extends ChangeNotifier{
     int? adCount;
     bool? adState;
 
@@ -75,3 +75,4 @@ class RewordAdsModel extends ChangeNotifier{
       notifyListeners();
     }
 }
+
