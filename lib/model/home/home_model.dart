@@ -1,11 +1,7 @@
-import 'dart:ffi';
-
 import'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'dart:io';
 
 class Request {
   Request(this.id, this.content, this.good, this.order, this.goodState);
@@ -57,7 +53,7 @@ class RequestListModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  void pushLikeIcon(requestId, _goodState, goodNum) async {
+  void pushLikeIcon(requestId, _goodState, voteNum) async {
     // ログイン情報を取得
     final User? user = FirebaseAuth.instance.currentUser;
 
@@ -69,7 +65,7 @@ class RequestListModel extends ChangeNotifier{
       });
 
       await FirebaseFirestore.instance.collection('requests').doc(requestId).update({
-        'good': ++goodNum
+        'good': ++voteNum
       });
     } else {
       await FirebaseFirestore.instance.collection('requestGoods').where('userId', isEqualTo: user!.uid).where('requestId', isEqualTo: requestId)
@@ -80,118 +76,9 @@ class RequestListModel extends ChangeNotifier{
       });
 
       await FirebaseFirestore.instance.collection('requests').doc(requestId).update({
-        'good': --goodNum
+        'good': --voteNum
       });
     }
     notifyListeners();
   }
 }
-
-class GoodStateModel extends ChangeNotifier{
-  final bool _goodState;
-  GoodStateModel(this._goodState);
-
-  bool? goodState;
-  void init() async {
-    this.goodState = _goodState;
-    notifyListeners();
-  }
-
-  void changeState(_state) async{
-    goodState = !_state;
-    notifyListeners();
-  }
-}
-
-class RewordVoteAdsModel extends ChangeNotifier{
-  final bool _goodState;
-  final int _goodNum;
-  RewordVoteAdsModel(this._goodState, this._goodNum);
-
-  bool? adState;
-  RewardedAd? _rewardedAd;
-
-  //GoodStateModel
-  bool? voteState;
-  int? goodNum;
-
-  void init() async {
-    adState = true;
-    voteState = _goodState;
-    this.goodNum = _goodNum;
-    notifyListeners();
-  }
-
-  void incrementGoodNum(_goodState) async{
-    goodNum = _goodState ? goodNum!+1 : goodNum!-1;
-    notifyListeners();
-  }
-
-  void changeVoteState() async{
-    voteState = voteState==true ? false : true;
-    notifyListeners();
-  }
-
-  void changeAdState() async{
-    adState = adState==true ? false : true;
-    notifyListeners();
-  }
-
-  void loadRewardedAd(String requestId) async {
-    print('model   right now');
-    changeAdState();
-    RewardedAd.load(
-      adUnitId: Platform.isIOS ? "ca-app-pub-3940256099942544/1712485313" : "	ca-app-pub-3940256099942544/5224354917",
-      request: AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-          onAdLoaded: (RewardedAd ad) {
-            print('$ad loaded.');
-            // Keep a reference to the ad so you can show it later.
-            this._rewardedAd = ad;
-            changeAdState();
-            showRewardedAd(requestId);
-            notifyListeners();
-          },
-          onAdFailedToLoad: (LoadAdError error) {
-            print('RewardedAd failed to load: $error');
-            this._rewardedAd = null;
-            changeAdState();
-            notifyListeners();
-          }),
-    );
-  }
-
-  void showRewardedAd(_requestId) {
-    if(_rewardedAd != null){
-      _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdShowedFullScreenContent : (RewardedAd ad) {
-          print("Ad onAdShowedFullScreenContent");
-        },
-        onAdDismissedFullScreenContent : (RewardedAd ad) {
-          ad.dispose();
-        },
-        onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error){
-          ad.dispose();
-        },
-      );
-
-      _rewardedAd!.setImmersiveMode(true);
-      _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-        print("${reward.amount} ${reward.type}");
-
-        // ここに報酬後の内容を記入
-        changeVoteState();
-        RequestListModel().pushLikeIcon(_requestId, voteState, goodNum);
-        incrementGoodNum(voteState);
-
-      });
-    }
-  }
-
-  void disposeAds() async{
-    _rewardedAd?.dispose();
-    notifyListeners();
-  }
-
-}
-

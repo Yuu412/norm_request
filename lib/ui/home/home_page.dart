@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:norm_request/const/color_config.dart';
 import 'package:norm_request/const/size_config.dart';
 import 'package:norm_request/model/home/home_model.dart';
+import 'package:norm_request/model/home/vote_ad_dialog_model.dart';
 import 'package:norm_request/ui/common/icon_widget/info_widget.dart';
-import 'package:norm_request/ui/home/request_ad_dialog.dart';
-import 'package:norm_request/ui/home/request_dialog.dart';
+import 'package:norm_request/ui/home/vote_ad_dialog.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(BlockSize().width(context) * 5),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
+        children: const <Widget>[
           PageTitleArea(),
           ShowRequestList(),
           ShowDialogButton(),
@@ -26,6 +28,8 @@ class HomePage extends StatelessWidget {
 }
 
 class PageTitleArea extends StatelessWidget {
+  const PageTitleArea({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,7 +45,9 @@ class PageTitleArea extends StatelessWidget {
 class ShowPageTitle extends StatelessWidget {
   final String title = '企業分析リクエスト一覧';
   final String subtitle = '分析してほしいリクエストに投票してください。';
-  final String description = 'normに分析してほしい企業を教えてください。good数が上位のものから優先的に分析します。';
+  final String description = '分析してほしい企業に投票してください。\n投票数が多い企業から優先的に分析します。\n\nまた、分析リクエストは画面下の「＋」ボタンから行ってください。';
+
+  const ShowPageTitle({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -74,6 +80,8 @@ class ShowPageTitle extends StatelessWidget {
 }
 
 class ShowRequestList extends StatelessWidget {
+  const ShowRequestList({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -88,12 +96,12 @@ class ShowRequestList extends StatelessWidget {
           }
 
           final List<Widget> widgets = requests.map(
-                (opinion) => RequestCard(
-              opinion.id,
-              opinion.content,
-              opinion.good,
-              opinion.order,
-              opinion.goodState,
+                (request) => RequestCard(
+              request.id,
+              request.content,
+              request.good,
+              request.order,
+              request.goodState,
             ),
           ).toList();
 
@@ -112,10 +120,10 @@ class ShowRequestList extends StatelessWidget {
 }
 
 class RequestCard extends StatelessWidget{
-  final String opinionId, content;
+  final String requestId, content;
   final int goodNum, order;
   final bool goodState;
-  RequestCard(this.opinionId, this.content, this.goodNum, this.order, this.goodState);
+  RequestCard(this.requestId, this.content, this.goodNum, this.order, this.goodState);
 
   @override
   Widget build(BuildContext context) {
@@ -125,10 +133,10 @@ class RequestCard extends StatelessWidget{
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            RequestCounter(order),
-            GoodPieChartArea(),
+            RequestOrder(order),
+            VotePieChartArea(),
             RequestCompanyInfo(content),
-            LikeIconArea(opinionId, goodState),
+            LikeIconArea(requestId, goodState),
           ],
         );
       }),
@@ -136,9 +144,9 @@ class RequestCard extends StatelessWidget{
   }
 }
 
-class RequestCounter extends StatelessWidget{
+class RequestOrder extends StatelessWidget{
   final int order;
-  RequestCounter(this.order);
+  RequestOrder(this.order);
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +160,9 @@ class RequestCounter extends StatelessWidget{
   }
 }
 
-class GoodPieChartArea extends StatelessWidget{
+class VotePieChartArea extends StatelessWidget{
+  const VotePieChartArea({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -160,7 +170,7 @@ class GoodPieChartArea extends StatelessWidget{
       height: BlockSize().height(context) * 9,
       child: Stack(
         children: [
-          GoodPieChart(),
+          VotePieChart(),
           ChartCenterTitle(),
         ],
       ),
@@ -168,11 +178,13 @@ class GoodPieChartArea extends StatelessWidget{
   }
 }
 
-class GoodPieChart extends StatelessWidget{
+class VotePieChart extends StatelessWidget{
+  const VotePieChart({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final RewordVoteAdsModel goodCountData = context.watch<RewordVoteAdsModel>();
-    final goodNum = goodCountData.goodNum!;
+    final goodNum = goodCountData.voteNum!;
     final ratio = ((goodNum < 11) ? goodNum : 10).toDouble();
     final pie = ((goodNum < 1) ? 1 : goodNum).toDouble();
 
@@ -196,13 +208,15 @@ class GoodPieChart extends StatelessWidget{
           ),
         ],
       ),
-      swapAnimationDuration: const Duration(milliseconds: 300), // Optional
-      swapAnimationCurve: Curves.linear, // Optional
+      swapAnimationDuration: const Duration(milliseconds: 2000), // Optional
+      swapAnimationCurve: Curves.linearToEaseOut, // Optional
     );
   }
 }
 
 class ChartCenterTitle extends StatelessWidget{
+  const ChartCenterTitle({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final RewordVoteAdsModel goodCountData = context.watch<RewordVoteAdsModel>();
@@ -211,7 +225,7 @@ class ChartCenterTitle extends StatelessWidget{
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            goodCountData.goodNum!.toInt().toString(),
+            goodCountData.voteNum!.toInt().toString(),
             style: TextStyle(
               color: Color(RetTextColor().gray()),
               fontWeight: FontWeight.w500,
@@ -219,7 +233,7 @@ class ChartCenterTitle extends StatelessWidget{
             ),
           ),
           Text(
-            'good',
+            'vote',
             style: TextStyle(
               color: Color(RetTextColor().lightGray()),
             ),
@@ -250,131 +264,7 @@ class RequestCompanyInfo extends StatelessWidget{
   }
 }
 
-class LikeIconArea extends StatelessWidget{
-  final String opinionId;
-  final bool goodState;
-  LikeIconArea(this.opinionId, this.goodState);
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: BlockSize().height(context) * 22,
-      child: Consumer<RewordVoteAdsModel>(builder: (context, model, child) {
-        return LikeIcon(opinionId);
-      }),
-    );
-  }
-}
-
-class LikeIcon extends StatelessWidget{
-  final String opinionId;
-  LikeIcon(this.opinionId);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: BlockSize().width(context) * 10,
-      child: PushedLikeIcon(opinionId),
-    );
-  }
-}
-
-class PushedLikeIcon extends StatelessWidget{
-  final String requestId;
-  PushedLikeIcon(this.requestId);
-
-  @override
-  Widget build(BuildContext context) {
-    final RewordVoteAdsModel goodStateModel = context.watch<RewordVoteAdsModel>();
-    final RequestListModel opinionListModel = context.watch<RequestListModel>();
-    final RewordVoteAdsModel adManager = context.watch<RewordVoteAdsModel>();
-
-    return Consumer<RewordVoteAdsModel>(builder: (context, model, child) {
-      if(adManager.adState == false){
-        return Center(child: CircularProgressIndicator());
-      }
-      return GestureDetector(
-        onTap: () {
-          if(goodStateModel.voteState == false){
-            adManager.loadRewardedAd(requestId);
-          } else{
-            goodStateModel.changeVoteState();
-            opinionListModel.pushLikeIcon(requestId, goodStateModel.voteState, goodStateModel.goodNum);
-            goodStateModel.incrementGoodNum(goodStateModel.voteState);
-          }
-        },
-        child: Container(
-          width: BlockSize().width(context) * 8,
-          height: BlockSize().height(context) * 4,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(RetBackgroundColor().white()),
-            boxShadow: [
-              BoxShadow(
-                color: Color(ShadowColor().shadowColor()), //色
-                offset: Offset(3, 3),
-                blurRadius: 10.0,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
-          child: switchIcon(goodStateModel.voteState),
-        ),
-      );
-    });
-  }
-
-  Widget switchIcon(state) {
-    switch (state) {
-      case true:
-        return Icon(
-          Icons.favorite,
-          color: Color(RetIconColor().pink()),
-          size: 22,
-        );
-      default:
-        return Icon(
-          Icons.favorite_border,
-          color: Color(RetIconColor().pink()),
-          size: 22,
-        );
-    }
-  }
-}
-
-class ShowDialogButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onTap: (){
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) {
-              return ShowRequestAdDialogProvider();
-              //return ShowRequestDialogProvider();
-            },
-          );
-        },
-        child: Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            color: Color(RetIconColor().blue()),
-            borderRadius: BorderRadius.circular(28),
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 
 
