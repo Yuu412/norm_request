@@ -36,8 +36,16 @@ class SearchCompanyModel extends ChangeNotifier {
     await FirebaseFirestore.instance.collection('companies').orderBy("name")
         .startAt([keyword]).endAt([keyword + '\uf8ff']).limit(20).get();
 
+    final QuerySnapshot companiesHiraganaSnapshot =
+    await FirebaseFirestore.instance.collection('companies').orderBy("hiragana")
+        .startAt([keyword]).endAt([keyword + '\uf8ff']).limit(20).get();
 
-    final List<Company> _companies = companiesSnapshot.docs.map((DocumentSnapshot document) {
+    final QuerySnapshot companiesHepburnSnapshot =
+    await FirebaseFirestore.instance.collection('companies').orderBy("hepburn")
+        .startAt([keyword]).endAt([keyword + '\uf8ff']).limit(20).get();
+
+
+    final List<Company> companyList = companiesSnapshot.docs.map((DocumentSnapshot document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
       final String companyId = document.id;
       final String name = data['name'];
@@ -45,10 +53,43 @@ class SearchCompanyModel extends ChangeNotifier {
       return Company(companyId, name, industry);
     }).toList();
 
-    companies = _companies;
+    final List<Company> _companiesHiragana = companiesHiraganaSnapshot.docs.map((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      final String companyId = document.id;
+      final String name = data['name'];
+      final String industry = data['industry'];
+      return Company(companyId, name, industry);
+    }).toList();
+    companyList.addAll(_companiesHiragana);
+
+    final List<Company> _companiesHepburn = companiesHepburnSnapshot.docs.map((DocumentSnapshot document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      final String companyId = document.id;
+      final String name = data['name'];
+      final String industry = data['industry'];
+      return Company(companyId, name, industry);
+    }).toList();
+    companyList.addAll(_companiesHepburn);
+
+    final List<String> _duplicateCompnies = [];
+    final List<Company> _removeCompnies = [];
+    companyList.asMap().forEach((int index, Company element) {
+      if(_duplicateCompnies.contains(element.companyId)){
+        _removeCompnies.add(element);
+      }
+      _duplicateCompnies.add(element.companyId);
+    });
+    // 重複した企業を削除
+    companyList.removeWhere((element) => _removeCompnies.contains(element));
+
+
+
+    companies = companyList;
 
     notifyListeners();
   }
+
+
 }
 
 class SelectCompanyModel extends ChangeNotifier {

@@ -5,6 +5,8 @@ import 'package:norm_request/const/size_config.dart';
 import 'package:norm_request/model/home/home_model.dart';
 import 'package:norm_request/model/home/vote_ad_dialog_model.dart';
 import 'package:norm_request/ui/common/icon_widget/info_widget.dart';
+import 'package:norm_request/ui/home/request_ad_dialog.dart';
+import 'package:norm_request/ui/home/request_dialog.dart';
 import 'package:norm_request/ui/home/vote_ad_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -259,6 +261,42 @@ class RequestCompanyInfo extends StatelessWidget{
           color: Color(RetTextColor().gray())
         ),
         overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class ShowDialogButton extends StatelessWidget {
+  const ShowDialogButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: GestureDetector(
+        onTap: (){
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) {
+              return ShowRequestAdDialogProvider();
+              //return ShowRequestDialogProvider();
+            },
+          );
+        },
+        child: Container(
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            color: Color(RetIconColor().blue()),
+            borderRadius: BorderRadius.circular(28),
+          ),
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
