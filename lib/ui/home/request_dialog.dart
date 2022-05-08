@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:norm_request/const/color_config.dart';
 import 'package:norm_request/const/size_config.dart';
 import 'package:norm_request/model/home/request_model.dart';
+import 'package:norm_request/ui/common/icon_widget/info_widget.dart';
 import 'package:provider/provider.dart';
 
 class ShowRequestDialogProvider extends StatelessWidget {
+  const ShowRequestDialogProvider({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<SearchCompanyModel>(
@@ -83,18 +86,24 @@ class ShowRequestDialog extends StatelessWidget {
       create: (_) => SelectCompanyModel()..init(),
       child: Consumer<SelectCompanyModel>(builder: (context, model, child) {
         return AlertDialog(
-          title: Text(
-            "企業名を入力してください",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Color(RetTextColor().blue()),
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "企業名で検索",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(RetTextColor().blue()),
+                ),
+              ),
+              InfoIcon('現段階では上場企業しか受け付けておりません。\n\nお問い合わせはnormインスタアカウントのDMにて受け付けております。'),
+            ],
           ),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "例：ソフトバンク",
                   prefixIcon: Icon(
                     Icons.search,
