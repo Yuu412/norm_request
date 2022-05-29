@@ -14,23 +14,21 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<User?>(
-    stream: FirebaseAuth.instance.authStateChanges(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        // スプラッシュ画面などに書き換えても良い
-        return const SizedBox();
-      }
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // スプラッシュ画面などに書き換えても良い
+            return const SizedBox();
+          }
 
+          //FirebaseAuth.instance.signOut();
 
-
-      //FirebaseAuth.instance.signOut();
-
-      if (snapshot.hasData) {
-        return HomeApp();
-      }
-      return LoginPage();
-    },
-  );
+          if (snapshot.hasData) {
+            return HomeApp();
+          }
+          return LoginPage();
+        },
+      );
 }
 
 class HomeApp extends StatefulWidget {
@@ -44,11 +42,12 @@ class _HomeApp extends State<HomeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-            home: Scaffold(
-              appBar: Header("route"),
-              body: JudgeUpdate(),
-            ),
-          );
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: Header("route"),
+        body: JudgeUpdate(),
+      ),
+    );
   }
 }
 
@@ -95,7 +94,6 @@ class JudgeUpdate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Future<void> versionCheck() async {
       //アプリのバージョンを取得
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -107,7 +105,8 @@ class JudgeUpdate extends StatelessWidget {
           .doc('8vcZ2rNFIL04UAWOKlXm')
           .get();
 
-      final newVersion =  Version.parse(doc.data()!['ios_force_app_version'] as String);
+      final newVersion =
+          Version.parse(doc.data()!['ios_force_app_version'] as String);
 
       //バージョンを比較し、現在のバージョンの方が低ければダイアログを出す
       if (currentVersion < newVersion) {
@@ -119,6 +118,4 @@ class JudgeUpdate extends StatelessWidget {
 
     return HomePage();
   }
-
 }
-
